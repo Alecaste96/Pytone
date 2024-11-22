@@ -76,38 +76,14 @@ def istogramma(statistica, anno, year_mapping):
 
 # Creo una funzione che mi permette di scoprire quali sono le statistiche meglio e peggio correlate con una desiderata
 
-def best_worst(stat):
- for file in files:
-    year = year_mapping[file]
-    data_frame = pd.read_excel(file)
-    data_frame['Duels'] = data_frame['Won'] + data_frame['Lost']
-
-    data_frame.drop(columns=colonne_da_eliminare, inplace=True) 
-
-    corr_matrix = data_frame.corr()
-
-    if stat in corr_matrix.columns:
-        # Ordina le correlazioni con la statistica scelta
-        sorted_corr = corr_matrix[stat].sort_values(ascending=False)
-
-        # Trova le 5 migliori e peggiori correlazioni (cambiare i range per saperne di più o di meno)
-        best_corr = sorted_corr[1:6]  # Parto da 1 per evitare la correlazione della statistica con se stessa
-        worst_corr = sorted_corr[-5:]
-
-        print(f"Anno {year}: Le 5 statistiche meglio correlate con {stat} sono:\n{best_corr}")
-        print(f"Anno {year}: Le 5 statistiche peggio correlate con {stat} sono:\n{worst_corr}")
-    else:
-        print(f"La statistica {stat} non è presente nel dataset. Controlla l'input")
-
 # Creo una funzione che restituisce l'elenco degli indci di correlazione di una statistica con le altre anno per anno
 
 def correlazioni_annuali(stat):
     for file in files:
         year = year_mapping[file]
         data_frame = pd.read_excel(file)  
-        data_frame['Duels'] = data_frame['Won'] + data_frame['Lost']
 
-        data_frame.drop(columns=colonne_da_eliminare, inplace=True)
+        data_frame.drop(columns = colonne_da_eliminare, inplace=True)
 
         corr_matrix = data_frame.corr()
 
@@ -127,9 +103,8 @@ def correlazione(stat1,stat2):
  for file in files:
     
     data_frame = pd.read_excel(file)
-    data_frame['Duels'] = data_frame['Won'] + data_frame['Lost']
 
-    data_frame.drop(columns=colonne_da_eliminare, inplace=True)
+    data_frame.drop(columns = colonne_da_eliminare, inplace=True)
 
     corr_matrix = data_frame.corr()
 
@@ -155,3 +130,13 @@ def correlazione(stat1,stat2):
     print(f"Il massimo valore dell'indice fra {stat1} e {stat2} è {correlation_df['Correlazione'].max()} il valore minimo è {correlation_df['Correlazione'].min()}")
  else:
     print("Nessun grafico disponibile: non sono state calcolate correlazioni valide. Controlla l'input")
+
+def freedman_diaconis_bins(data):
+    q25, q75 = np.percentile(data, [25, 75])
+    iqr = q75 - q25
+    if iqr == 0:  # Evitare divisioni per zero
+        return 20  # Numero di bin di default in caso di IQR nullo
+    bin_width = 2 * iqr / (len(data) ** (1 / 3))
+    if bin_width == 0:
+        return 5  # Numero di bin di default in caso di width troppo piccolo
+    return int(np.ceil((data.max() - data.min()) / bin_width))
