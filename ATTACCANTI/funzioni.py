@@ -21,13 +21,18 @@ year_mapping= {'attaccanti_23.xlsx': 2023,'attaccanti_22.xlsx': 2022,'attaccanti
                 'attaccanti_19.xlsx': 2019}
 
 def istogramma(statistica, anno, year_mapping):
-    # Verifica che l'anno esista nel mapping
-    if anno not in year_mapping:
-        print(f"L'anno {anno} non è valido. Gli anni disponibili sono: {list(year_mapping.keys())}")
+    # Trova il file corrispondente all'anno
+    file = None
+    for key, value in year_mapping.items():
+        if value == anno:  # Cerca l'anno tra i valori di year_mapping
+            file = key
+            break
+
+    if not file:
+        print(f"L'anno {anno} non è valido. Gli anni disponibili sono: {list(year_mapping.values())}")
         return
 
-    # Carica il dataset corrispondente all'anno
-    file = year_mapping[anno]
+    # Carica il dataset corrispondente al file trovato
     data = pd.read_excel(file)
 
     # Seleziona la colonna specificata
@@ -65,7 +70,7 @@ def istogramma(statistica, anno, year_mapping):
     plt.ylabel('Numero di giocatori')
 
     # Mostrare il grafico
-    plt.show()
+    #plt.show()
 
     # Calcola e stampa la media della colonna
     media = col_data.mean()
@@ -73,6 +78,7 @@ def istogramma(statistica, anno, year_mapping):
     giocatore_max = data.loc[data[statistica].idxmax()]['Player']
     max_value = col_data.max()
     print(f"Il giocatore che ha registrato il maggior numero di {statistica} è {giocatore_max} con {max_value:.2f}.")
+
 
 # Creo una funzione che mi permette di scoprire quali sono le statistiche meglio e peggio correlate con una desiderata
 
